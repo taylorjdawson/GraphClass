@@ -1,7 +1,4 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 public class Graph<T> {
 
@@ -19,39 +16,78 @@ public class Graph<T> {
     }
 
     public int getEdgeWeight(T source, T destination) {
-        return 0;
+        return edgeExists(source , destination) ? adjacencyList.get(source).get(destination) : -1;
     }
 
     public boolean edgeExists(T source, T destination) {
-        return false;
+
+        boolean edgeExists = false;
+
+        // If either the source or the destination vertex don't exist then by deduction an edge can not exist
+        if (vertexExists(source) && vertexExists(destination))
+        {
+            edgeExists = adjacencyList.get(source).containsKey(destination);
+        }
+
+        // vertexExists(source) && vertexExists(destination) && adjacencyList.get(source).containsKey(destination)
+        return edgeExists;
     }
 
     public void addVertex(T vertex) throws IllegalArgumentException {
-        adjacencyList.put(vertex, new HashMap<>());
+        if (vertex != null)
+        {
+            adjacencyList.put(vertex, new HashMap<>());
+        }
     }
 
     public void removeVertex(T vertex) throws NoSuchElementException {
-
-        //TODO: Check that the vertex exists
-        adjacencyList.remove(vertex);
+        if (vertexExists(vertex))
+        {
+            for (T vert : adjacencyList.keySet())
+            {
+                adjacencyList.get(vert).remove(vertex);
+            }
+            adjacencyList.remove(vertex);
+            /*
+            Iterator it = adjacencyList.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                System.out.println(pair.getKey() + " = " + pair.getValue());
+                it.remove();
+            }
+            */
+        }
     }
 
     public void addEdge(T source, T destination, int weight)
             throws IllegalArgumentException, NoSuchElementException {
 
-        //TODO: Check that edges don't already exist
+        // Check that the vertices exist
+        if (!(vertexExists(source) && vertexExists(destination))) {
+            throw new NoSuchElementException();
+        }
 
-        //TODO: Check that the vertex exists
         adjacencyList.get(source).put(destination, weight);
+
+        if (!_isDirected) {
+            adjacencyList.get(destination).put(source, weight);
+        }
     }
 
     public void removeEdge(T source, T destination) throws
             NoSuchElementException {
+        if (!edgeExists(source, destination))
+        {
+            throw new NoSuchElementException();
+        }
+        adjacencyList.get(source).remove(destination);
     }
 
     public String toString() {
         return null;
     }
-}
 
-//TODO: Implement using map of maps
+    private boolean vertexExists(T vertex) {
+        return adjacencyList.containsKey(vertex);
+    }
+}
