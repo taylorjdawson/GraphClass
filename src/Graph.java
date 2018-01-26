@@ -15,10 +15,22 @@ public class Graph<T> {
         return new ArrayList<T>(adjacencyList.keySet());
     }
 
+    /**
+     * Returns the weight of the specified edge
+     * @param source the source vertex
+     * @param destination the destination vertex
+     * @return the weight of the specified edge
+     */
     public int getEdgeWeight(T source, T destination) {
         return edgeExists(source , destination) ? adjacencyList.get(source).get(destination) : -1;
     }
 
+    /**
+     * Determines if an edge exists.
+     * @param source the source vertex
+     * @param destination the destination vertex
+     * @return true if an edge exists, false if does not.
+     */
     public boolean edgeExists(T source, T destination) {
 
         boolean edgeExists = false;
@@ -48,14 +60,6 @@ public class Graph<T> {
                 adjacencyList.get(vert).remove(vertex);
             }
             adjacencyList.remove(vertex);
-            /*
-            Iterator it = adjacencyList.entrySet().iterator();
-            while (it.hasNext()) {
-                Map.Entry pair = (Map.Entry) it.next();
-                System.out.println(pair.getKey() + " = " + pair.getValue());
-                it.remove();
-            }
-            */
         }
     }
 
