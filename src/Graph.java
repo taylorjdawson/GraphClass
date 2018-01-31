@@ -251,7 +251,7 @@ public class Graph<T> {
      *
      * @param <E> the type of object
      */
-    public static class Edge<E> {
+    public static class Edge<E> implements Comparable<Edge<E>> {
 
         private int _weight;
         private E _destination;
@@ -306,6 +306,12 @@ public class Graph<T> {
         public String toString() {
             return "source: " + _source.toString() + "destination: " +
                     _destination.toString() + "weight: " + _weight;
+        }
+
+
+        @Override
+        public int compareTo(Edge<E> edge) {
+            return this._weight - edge._weight;
         }
     }
 }
