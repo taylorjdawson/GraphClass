@@ -178,21 +178,7 @@ public class Graph<T> {
      * @return the string representation of the graph
      */
     public String toString() {
-        Set<T> vertices = _adjacencyList.keySet();
-        StringBuilder stringBuilder = new StringBuilder("Vertices: ");
-        stringBuilder.append(Arrays.toString(vertices.toArray()));
-        stringBuilder.append("\nSource -> Destination (Weight)\n");
-        for (T sourceVertex : _adjacencyList.keySet()) {
-            for (T destinationVertex : _adjacencyList.get(sourceVertex).keySet()) {
-                stringBuilder.append(sourceVertex.toString()).append(" -> ")
-                        .append(destinationVertex.toString()).append(' ')
-                        .append("( ")
-                        .append(_adjacencyList.get(sourceVertex)
-                                .get(destinationVertex)).append(" )\n");
-            }
-        }
-
-        return _adjacencyList.toString();
+        return "_isDirected: " + _isDirected + "\n" + _adjacencyList.toString();
     }
 
 
@@ -265,7 +251,8 @@ public class Graph<T> {
          * @return the string representation of the edge
          */
         public String toString() {
-            return "source: " + _source.toString() + "destination: " + _destination.toString() + "weight: " + _weight;
+            return "source: " + _source.toString() + "destination: " +
+                    _destination.toString() + "weight: " + _weight;
         }
     }
 }
