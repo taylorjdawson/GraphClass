@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -179,6 +180,58 @@ public class Graph<T> {
      */
     public String toString() {
         return "_isDirected: " + _isDirected + "\n" + _adjacencyList.toString();
+    }
+
+
+    /**
+     * Returns the length of the specified path or -1 if the sequence is not a
+     * path or the list is empty.
+     * @param path the path whose length is in question
+     * @return the length of the specified path or -1 if the sequence is not a
+     * path or the list is empty.
+     */
+    public long pathLength(List<T> path) {
+        return 0;
+    }
+
+
+    /**
+     * Finds the shortest path between the specified two vertices.
+     * @param source the source vertex
+     * @param destination the destination vertex
+     * @return the list of vertices that form the shortest path or null if no
+     * path exists.
+     * @throws NoSuchElementException if one or more of vertices don't exist.
+     */
+    public List<Edge<T>> shortestPathBetween(T source, T destination)
+            throws NoSuchElementException {
+        return null;
+    }
+
+
+    /**
+     * Constructs a graph from the specified csv file which must be in the
+     * following format:
+     * <p>
+     * <# of vertices>
+     * <first vertex>
+     * <second vertex>
+     * ...
+     * <nth vertex>
+     * <# of edges>
+     * <source>,<destination>,<weight>
+     * <source>,<destination>,<weight>
+     * ...
+     * </p>
+     * @param isDirected a boolean that indicates if the graph is directed
+     * @param inputFile the file from which to read in the graph data
+     * @return a {@code Graph} object
+     * @throws IOException if there is a problem with the file
+     */
+    public static Graph<String> fromCSVFile(boolean isDirected,
+                                            Scanner inputFile)
+            throws IOException {
+        return null;
     }
 
 
