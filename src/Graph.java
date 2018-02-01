@@ -191,6 +191,8 @@ public class Graph<T> {
      * path or the list is empty.
      */
     public long pathLength(List<T> path) {
+
+
         return 0;
     }
 
@@ -205,6 +207,35 @@ public class Graph<T> {
      */
     public List<Edge<T>> shortestPathBetween(T source, T destination)
             throws NoSuchElementException {
+        
+        // TODO: Rename possibly
+        PriorityQueue<T> priorityQueue = new PriorityQueue<T>();
+
+        HashMap<T, Integer> connectedVertices;
+
+        // TODO: Change this possibly
+        boolean pathNotFound = true;
+        
+        // TODO: is this the right way?
+        HashSet unvisitedVertices = (HashSet) _adjacencyList.keySet();
+        
+        // Remove our starting vertex
+        T currentVertex = source;
+        unvisitedVertices.remove(source);
+        
+        while(pathNotFound)
+        {
+            // Get list of all vertices connected to source vertex, create edge 
+            // objects, and throw them into the priorityQueue
+            connectedVertices = _adjacencyList.get(source);
+
+            for (T vertex : connectedVertices.keySet()) {
+                priorityQueue.add((T) new Edge<T>(currentVertex, vertex, connectedVertices.get(vertex)));
+            }
+            
+            
+        }
+        
         return null;
     }
 
@@ -311,7 +342,7 @@ public class Graph<T> {
 
         @Override
         public int compareTo(Edge<E> edge) {
-            return this._weight - edge._weight;
+            return Integer.compare(this._weight, edge._weight);
         }
     }
 }
