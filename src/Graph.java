@@ -25,6 +25,52 @@ public class Graph<T> {
 
 
     /**
+     * Constructs a graph from the specified csv file which must be in the
+     * following format:
+     * <p>
+     * <# of vertices>
+     * <first vertex>
+     * <second vertex>
+     * ...
+     * <nth vertex>
+     * <# of edges>
+     * <source>,<destination>,<weight>
+     * <source>,<destination>,<weight>
+     * ...
+     * </p>
+     *
+     * @param isDirected a boolean that indicates if the graph is directed
+     * @param inputFile  the file from which to read in the graph data
+     * @return a {@code Graph} object
+     * @throws IOException if there is a problem with the file
+     */
+    public static Graph<String> fromCSVFile(boolean isDirected,
+                                            Scanner inputFile)
+            throws IOException {
+
+        int numEdges;
+        Graph<String> graph = new Graph<>(isDirected);
+        int numVertices = inputFile.nextInt();
+
+        for (int i = 0; i < numVertices + 1; i++) {
+            graph.addVertex(inputFile.nextLine());
+        }
+
+        numEdges = inputFile.nextInt();
+
+        // Set the delimiter to denominate for a carriage return or comma
+        inputFile.useDelimiter("[,\r]");
+
+        for (int i = 0; i < numEdges; i++) {
+            graph.addEdge(inputFile.next().trim(), inputFile.next().trim(),
+                    inputFile.nextInt());
+        }
+
+        return graph;
+    }
+
+
+    /**
      * Returns a list of vertices within the graph
      *
      * @return a list of vertices within the graph
@@ -186,20 +232,45 @@ public class Graph<T> {
     /**
      * Returns the length of the specified path or -1 if the sequence is not a
      * path or the list is empty.
+     *
      * @param path the path whose length is in question
      * @return the length of the specified path or -1 if the sequence is not a
      * path or the list is empty.
      */
     public long pathLength(List<T> path) {
+        int pathLength = -1;
+        boolean edgeExists = true;
 
+        T source;
+        T destination;
 
-        return 0;
+        if (path.size() > 1) {
+            source = path.get(0);
+            destination = path.get(1);
+
+            if (edgeExists(source, destination)) {
+
+                pathLength = _adjacencyList.get(path.get(0)).get(path.get(1));
+
+                for (int i = 2; i < path.size() && edgeExists(source,
+                        destination); i++) {
+
+                    source = destination;
+                    destination = path.get(i);
+
+                    pathLength += _adjacencyList.get(source).get(destination);
+                }
+            }
+        }
+
+        return pathLength;
     }
 
 
     /**
      * Finds the shortest path between the specified two vertices.
-     * @param source the source vertex
+     *
+     * @param source      the source vertex
      * @param destination the destination vertex
      * @return the list of vertices that form the shortest path or null if no
      * path exists.
@@ -207,62 +278,72 @@ public class Graph<T> {
      */
     public List<Edge<T>> shortestPathBetween(T source, T destination)
             throws NoSuchElementException {
-        
-        // TODO: Rename possibly
-        PriorityQueue<T> priorityQueue = new PriorityQueue<T>();
+
+        if (!(vertexExists(source) && vertexExists(destination))) {
+            throw new NoSuchElementException();
+        }
+
+        PriorityQueue<Edge<T>> priorityQueue = new PriorityQueue<>();
+
+        boolean done = false;
 
         HashMap<T, Integer> connectedVertices;
 
-        // TODO: Change this possibly
-        boolean pathNotFound = true;
-        
-        // TODO: is this the right way?
-        HashSet unvisitedVertices = (HashSet) _adjacencyList.keySet();
-        
+        HashMap<T, T> visitedVertices = new HashMap<>();
+
+        List<Edge<T>> path = new LinkedList<>();
+
+        int weight = 0;
+
         // Remove our starting vertex
         T currentVertex = source;
-        unvisitedVertices.remove(source);
-        
-        while(pathNotFound)
-        {
-            // Get list of all vertices connected to source vertex, create edge 
+
+        Edge<T> currentEdge = null;
+
+        // TODO: is_Directed?
+        // TODO: Source and Destination are equal?
+        while (!done) {
+            // Get list of all vertices connected to source vertex, create edge
             // objects, and throw them into the priorityQueue
-            connectedVertices = _adjacencyList.get(source);
 
+            connectedVertices = _adjacencyList.get(currentVertex);
+
+            // TODO: Check if set is empty or not
             for (T vertex : connectedVertices.keySet()) {
-                priorityQueue.add((T) new Edge<T>(currentVertex, vertex, connectedVertices.get(vertex)));
+                priorityQueue.add(new Edge<>(currentVertex, vertex,
+                        connectedVertices.get(vertex) + weight));
             }
-            
-            
+
+
+            currentEdge = priorityQueue.remove();
+
+            while (visitedVertices.containsKey(
+                    currentEdge.getDestination()
+            )) {
+                currentEdge =
+                        priorityQueue.poll();
+            }
+
+            currentVertex = currentEdge.getDestination();
+
+            visitedVertices.put(currentEdge.getDestination(),
+                    currentEdge.getSource());
+
+            weight = currentEdge.getWeight();
+            done = priorityQueue.isEmpty() || currentVertex.equals(destination);
         }
-        
-        return null;
-    }
 
+        if (currentVertex.equals(destination)) {
+            while (!currentVertex.equals(source)) {
+                path.add(new Edge<>(visitedVertices.get(currentVertex),
+                        currentVertex, _adjacencyList.get(visitedVertices
+                        .get(currentVertex)).get(currentVertex)));
 
-    /**
-     * Constructs a graph from the specified csv file which must be in the
-     * following format:
-     * <p>
-     * <# of vertices>
-     * <first vertex>
-     * <second vertex>
-     * ...
-     * <nth vertex>
-     * <# of edges>
-     * <source>,<destination>,<weight>
-     * <source>,<destination>,<weight>
-     * ...
-     * </p>
-     * @param isDirected a boolean that indicates if the graph is directed
-     * @param inputFile the file from which to read in the graph data
-     * @return a {@code Graph} object
-     * @throws IOException if there is a problem with the file
-     */
-    public static Graph<String> fromCSVFile(boolean isDirected,
-                                            Scanner inputFile)
-            throws IOException {
-        return null;
+                currentVertex = visitedVertices.get(currentVertex);
+            }
+        }
+
+        return path;
     }
 
 
@@ -291,9 +372,10 @@ public class Graph<T> {
 
         /**
          * Constructs and Edge object
-         * @param source the source vertex
+         *
+         * @param source      the source vertex
          * @param destination the destination vertex
-         * @param weight the weight of the edge
+         * @param weight      the weight of the edge
          */
         public Edge(E source, E destination, int weight) {
             _source = source;
@@ -304,6 +386,7 @@ public class Graph<T> {
 
         /**
          * Returns The weight of the edge
+         *
          * @return the weight of the edge
          */
         public int getWeight() {
